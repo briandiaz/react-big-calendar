@@ -119,6 +119,8 @@ class MonthView extends React.Component {
       }),
       false,
     );
+
+    document.body.addEventListener('click', this.handleOutsideClick);
   }
 
   componentDidUpdate() {
@@ -127,10 +129,21 @@ class MonthView extends React.Component {
 
   componentWillUnmount() {
     window.removeEventListener('resize', this._resizeListener, false);
+
+    document.body.removeEventListener('click', this.handleOutsideClick);
   }
 
   getContainer = () => {
     return findDOMNode(this);
+  };
+
+  handleOutsideClick = event => {
+    const { monthView } = this.refs;
+    const { target } = event;
+
+    if (target !== monthView && !monthView.contains(target)) {
+      notify(this.props.onSelectSlot, {});
+    }
   };
 
   render() {
@@ -141,7 +154,7 @@ class MonthView extends React.Component {
     this._weekCount = weeks.length;
 
     return (
-      <div className={cn('rbc-month-view', className)}>
+      <div ref="monthView" className={cn('rbc-month-view', className)}>
         <div className="rbc-row rbc-month-header">
           {this.renderHeaders(weeks[0], weekdayFormat, culture)}
         </div>
